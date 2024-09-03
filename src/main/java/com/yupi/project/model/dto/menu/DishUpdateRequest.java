@@ -10,19 +10,20 @@ import java.io.Serializable;
  * @author nyf
  */
 @Data
-public class MenuAddRequest implements Serializable {
+public class DishUpdateRequest implements Serializable {
 
     /**
      * 家的id
      */
-    private Long homeId;
+    private Integer Id;
+
 
     /**
      * 菜品昵称
      */
-    private String dishName;
+    private String foodName;
 
-    private Integer price;
+    private Integer Price;
 
     /**
      * 菜品分类

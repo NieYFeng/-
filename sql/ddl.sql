@@ -15,7 +15,7 @@ create table if not exists user
     userRole     varchar(256) default 'user'            not null comment '用户角色：user / admin',
     createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    isDelete     tinyint      default 0                 not null comment '是否删除',
+    isDelete     tinyint      default 0                 not null comment '是否删除'
 ) comment '用户';
 
 -- 帖子表
@@ -43,14 +43,17 @@ create table if not exists post
 
 create table if not exists dish
 (
-    id           bigint auto_increment comment 'id' primary key,
-    homeId       bigint,                              -- 菜品表中的家的ID字段
-    dishName     varchar(256)                       null comment '菜品名称'
-    dishText     varchar(256)                       null comment '菜品描述'
-    dishPhoto    varchar(256)                       null comment '菜品图片'
-    price        tinyint default 0                  not null default 0 comment '菜品价格'
-    catagory     varchar(256)                       null comment '菜品类别'
+    dishId           bigint auto_increment comment 'id' primary key,
+    homeId       bigint                             not null comment '家的Id',-- 菜品表中的家的ID字段
+    dishName     varchar(256)                       null comment '菜品名称',
+    dishText     varchar(256)                       null comment '菜品描述',
+    dishPhoto    varchar(256)                       null comment '菜品图片',
+    price        tinyint default 0                  not null default 0 comment '菜品价格',
+    category     varchar(256)                       null comment '菜品类别',
     updateTime    datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     createTime    datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     isDelete      tinyint  default 0                 not null comment '是否删除'
 )
+SELECT * FROM dish WHERE dishId = 5;
+
+

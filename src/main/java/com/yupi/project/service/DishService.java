@@ -2,6 +2,7 @@ package com.yupi.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yupi.project.model.entity.Dish;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 
 /**

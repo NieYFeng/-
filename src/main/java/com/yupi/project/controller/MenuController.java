@@ -8,10 +8,14 @@ import com.yupi.project.common.DeleteRequest;
 import com.yupi.project.common.ErrorCode;
 import com.yupi.project.common.ResultUtils;
 import com.yupi.project.exception.BusinessException;
+import com.yupi.project.model.dto.menu.DeleteDishRequest;
+import com.yupi.project.model.dto.menu.DishQueryRequest;
+import com.yupi.project.model.dto.menu.DishUpdateRequest;
 import com.yupi.project.model.dto.menu.MenuAddRequest;
 import com.yupi.project.model.dto.user.*;
 import com.yupi.project.model.entity.Dish;
 import com.yupi.project.model.entity.User;
+import com.yupi.project.model.vo.DishVO;
 import com.yupi.project.model.vo.UserVO;
 import com.yupi.project.service.DishService;
 import com.yupi.project.service.UserService;
@@ -20,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,21 +41,6 @@ public class MenuController {
     @Resource
     private DishService dishService;
 
-
-    /**
-     * 获取当前登录用户
-     *
-     * @param request
-     * @return
-     */
-    @GetMapping("/get/login")
-    public BaseResponse<UserVO> getLoginUser(HttpServletRequest request) {
-        User user = userService.getLoginUser(request);
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        return ResultUtils.success(userVO);
-    }
-
     /**
      * 创建菜品
      *
@@ -58,7 +48,7 @@ public class MenuController {
      * @param request
      * @return
      */
-    @PostMapping("/add")
+    @GetMapping("/add")
     public BaseResponse<Long> adddish(@RequestBody MenuAddRequest menuAddRequest, HttpServletRequest request) {
         if (menuAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -69,40 +59,43 @@ public class MenuController {
         if (!result) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR);
         }
-        return ResultUtils.success(dish.getId());
+        return ResultUtils.success(dish.getDishId());
     }
 
     /**
      * 删除菜品
      *
-     * @param deleteRequest
+     * @param deleteDishRequest
      * @param request
      * @return
      */
-    @PostMapping("/delete")
-    public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
-        if (deleteRequest == null || deleteRequest.getId() <= 0) {
+    @GetMapping("/delete")
+    public BaseResponse<Boolean> deleteDish(@RequestBody DeleteDishRequest deleteDishRequest, HttpServletRequest request) {
+        if (deleteDishRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        boolean b = dishService.removeById(deleteRequest.getId());
+        boolean b = dishService.removeById(deleteDishRequest.getDishId());
+        if (!b) {
+            throw new BusinessException(ErrorCode.OPERATION_ERROR);
+        }
         return ResultUtils.success(b);
     }
 
     /**
      * 更新用户
      *
-     * @param userUpdateRequest
+     * @param dishUpdateRequest
      * @param request
      * @return
      */
-    @PostMapping("/update")
-    public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest, HttpServletRequest request) {
-        if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
+    @GetMapping("/update")
+    public BaseResponse<Boolean> updateDish(@RequestBody DishUpdateRequest dishUpdateRequest, HttpServletRequest request) {
+        if (dishUpdateRequest == null || dishUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User user = new User();
-        BeanUtils.copyProperties(userUpdateRequest, user);
-        boolean result = userService.updateById(user);
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishUpdateRequest, dish);
+        boolean result = dishService.updateById(dish);
         return ResultUtils.success(result);
     }
 
@@ -110,53 +103,24 @@ public class MenuController {
     /**
      * 获取用户列表
      *
-     * @param userQueryRequest
+     * @param dishQueryRequest
      * @param request
      * @return
      */
     @GetMapping("/list")
-    public BaseResponse<List<UserVO>> listUser(UserQueryRequest userQueryRequest, HttpServletRequest request) {
-        User userQuery = new User();
-        if (userQueryRequest != null) {
-            BeanUtils.copyProperties(userQueryRequest, userQuery);
+    public BaseResponse<List<DishVO>> listDish(DishQueryRequest dishQueryRequest, HttpServletRequest request) {
+        Dish dishQuery = new Dish();
+        if (dishQueryRequest != null) {
+            BeanUtils.copyProperties(dishQueryRequest, dishQuery);
         }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>(userQuery);
-        List<User> userList = userService.list(queryWrapper);
-        List<UserVO> userVOList = userList.stream().map(user -> {
-            UserVO userVO = new UserVO();
-            BeanUtils.copyProperties(user, userVO);
-            return userVO;
+        QueryWrapper<Dish> queryWrapper = new QueryWrapper<>(dishQuery);
+        List<Dish> dishList = dishService.list(queryWrapper);
+        List<DishVO> dishVOList = dishList.stream().map(dish -> {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(dish, dishVO);
+            return dishVO;
         }).collect(Collectors.toList());
-        return ResultUtils.success(userVOList);
-    }
-
-    /**
-     * 分页获取用户列表
-     *
-     * @param userQueryRequest
-     * @param request
-     * @return
-     */
-    @GetMapping("/list/page")
-    public BaseResponse<Page<UserVO>> listUserByPage(UserQueryRequest userQueryRequest, HttpServletRequest request) {
-        long current = 1;
-        long size = 10;
-        User userQuery = new User();
-        if (userQueryRequest != null) {
-            BeanUtils.copyProperties(userQueryRequest, userQuery);
-            current = userQueryRequest.getCurrent();
-            size = userQueryRequest.getPageSize();
-        }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>(userQuery);
-        Page<User> userPage = userService.page(new Page<>(current, size), queryWrapper);
-        Page<UserVO> userVOPage = new PageDTO<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
-        List<UserVO> userVOList = userPage.getRecords().stream().map(user -> {
-            UserVO userVO = new UserVO();
-            BeanUtils.copyProperties(user, userVO);
-            return userVO;
-        }).collect(Collectors.toList());
-        userVOPage.setRecords(userVOList);
-        return ResultUtils.success(userVOPage);
+        return ResultUtils.success(dishVOList);
     }
 
     // endregion

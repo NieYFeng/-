@@ -1,4 +1,4 @@
-package com.yupi.project.common;
+package com.yupi.project.model.dto.menu;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * 删除请求
  *
- * @author yupi
+ * @author nyf
  */
 @Data
 public class DeleteDishRequest implements Serializable {
@@ -15,11 +15,6 @@ public class DeleteDishRequest implements Serializable {
      * 菜品id
      */
     private Long dishId;
-
-    /**
-     * 家的id
-     */
-    private Long homeId;
 
     private static final long serialVersionUID = 1L;
 }

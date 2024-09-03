@@ -1,20 +1,25 @@
-package com.yupi.project.model.dto.menu;
+package com.yupi.project.model.vo;
 
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 用户创建请求
+ * 菜品
  *
- * @author nyf
+ * @TableName dish
  */
+@TableName(value = "dish")
 @Data
-public class MenuAddRequest implements Serializable {
-
+public class DishVO implements Serializable {
     /**
-     * 家的id
+     * id
      */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
     private Long homeId;
 
     /**
@@ -22,7 +27,7 @@ public class MenuAddRequest implements Serializable {
      */
     private String dishName;
 
-    private Integer price;
+    private Integer Price;
 
     /**
      * 菜品分类
@@ -39,5 +44,6 @@ public class MenuAddRequest implements Serializable {
      */
     private String dishPhoto;
 
+    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }
