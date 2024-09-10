@@ -2,6 +2,9 @@ package com.yupi.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yupi.project.model.entity.Post;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author yupili
@@ -10,7 +13,8 @@ import com.yupi.project.model.entity.Post;
 * @Entity com.yupi.project.model.entity.Post
 */
 public interface PostMapper extends BaseMapper<Post> {
-
+//   游标分页查询Post
+    List<Post> selectCursorPage(@Param("lastId") long lastId, @Param("pageSize") long pageSize);
 }
 
 

@@ -48,7 +48,7 @@ public class MenuController {
      * @param request
      * @return
      */
-    @GetMapping("/add")
+    @PostMapping("/add")
     public BaseResponse<Long> adddish(@RequestBody MenuAddRequest menuAddRequest, HttpServletRequest request) {
         if (menuAddRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -69,7 +69,7 @@ public class MenuController {
      * @param request
      * @return
      */
-    @GetMapping("/delete")
+    @PostMapping("/delete")
     public BaseResponse<Boolean> deleteDish(@RequestBody DeleteDishRequest deleteDishRequest, HttpServletRequest request) {
         if (deleteDishRequest == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -88,14 +88,17 @@ public class MenuController {
      * @param request
      * @return
      */
-    @GetMapping("/update")
+    @PostMapping("/update")
     public BaseResponse<Boolean> updateDish(@RequestBody DishUpdateRequest dishUpdateRequest, HttpServletRequest request) {
-        if (dishUpdateRequest == null || dishUpdateRequest.getId() == null) {
+        if (dishUpdateRequest == null || dishUpdateRequest.getDishId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishUpdateRequest, dish);
         boolean result = dishService.updateById(dish);
+        if(!result){
+            throw new BusinessException(ErrorCode.OPERATION_ERROR);
+        }
         return ResultUtils.success(result);
     }
 
@@ -108,7 +111,7 @@ public class MenuController {
      * @return
      */
     @GetMapping("/list")
-    public BaseResponse<List<DishVO>> listDish(DishQueryRequest dishQueryRequest, HttpServletRequest request) {
+    public BaseResponse<List<DishVO>> listDish(@RequestBody DishQueryRequest dishQueryRequest, HttpServletRequest request) {
         Dish dishQuery = new Dish();
         if (dishQueryRequest != null) {
             BeanUtils.copyProperties(dishQueryRequest, dishQuery);

@@ -33,4 +33,8 @@
         viewNum,thumbNum,userId,
         createTime,updateTime,isDelete
     </sql>
+    <select id="selectCursorPage">
+        select content,photo,thumbNum from post where postId > #{lastId}
+        order by postId asc LIMIT #{pageSize}
+    </select>
 </mapper>

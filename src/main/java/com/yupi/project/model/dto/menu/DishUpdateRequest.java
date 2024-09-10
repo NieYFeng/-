@@ -13,17 +13,17 @@ import java.io.Serializable;
 public class DishUpdateRequest implements Serializable {
 
     /**
-     * 家的id
+     * 菜品的id
      */
-    private Integer Id;
+    private Long dishId;
 
 
     /**
      * 菜品昵称
      */
-    private String foodName;
+    private String dishName;
 
-    private Integer Price;
+    private Integer price;
 
     /**
      * 菜品分类

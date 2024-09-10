@@ -18,7 +18,7 @@ public class DishVO implements Serializable {
      * id
      */
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Long dishId;
 
     private Long homeId;
 

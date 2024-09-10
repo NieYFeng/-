@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * 帖子接口
  *
- * @author yupi
+ * @author nyf
  */
 @RestController
 @RequestMapping("/post")
@@ -64,14 +65,11 @@ public class PostController {
         Post post = new Post();
         BeanUtils.copyProperties(postAddRequest, post);
         // 校验
-        postService.validPost(post, true);
-        User loginUser = userService.getLoginUser(request);
-        post.setUserId(loginUser.getId());
         boolean result = postService.save(post);
         if (!result) {
             throw new BusinessException(ErrorCode.OPERATION_ERROR);
         }
-        long newPostId = post.getId();
+        long newPostId = post.getPostId();
         return ResultUtils.success(newPostId);
     }
 
@@ -112,7 +110,7 @@ public class PostController {
     @PostMapping("/update")
     public BaseResponse<Boolean> updatePost(@RequestBody PostUpdateRequest postUpdateRequest,
                                             HttpServletRequest request) {
-        if (postUpdateRequest == null || postUpdateRequest.getId() <= 0) {
+        if (postUpdateRequest == null || postUpdateRequest.getPostId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         Post post = new Post();
@@ -120,7 +118,7 @@ public class PostController {
         // 参数校验
         postService.validPost(post, false);
         User user = userService.getLoginUser(request);
-        long id = postUpdateRequest.getId();
+        long id = postUpdateRequest.getPostId();
         // 判断是否存在
         Post oldPost = postService.getById(id);
         if (oldPost == null) {
@@ -199,7 +197,21 @@ public class PostController {
         Page<Post> postPage = postService.page(new Page<>(current, size), queryWrapper);
         return ResultUtils.success(postPage);
     }
-
-    // endregion
+    /**
+     * 光标分页获取列表
+     *
+     * @param postQueryRequest
+     * @param request
+     * @return
+     */
+    @GetMapping("/cursor/page")
+    public BaseResponse<List<Post>> listPostByCursor(PostQueryRequest postQueryRequest, HttpServletRequest request) {
+        if (postQueryRequest == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        List<Post> postPage = new ArrayList<>();
+        postPage = postService.getCursorPage(postQueryRequest);
+        return ResultUtils.success(postPage);
+    }
 
 }

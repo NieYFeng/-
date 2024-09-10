@@ -15,7 +15,7 @@ public class DishQueryRequest implements Serializable {
     /**
      * 家的id
      */
-    private Integer homeId;
+    private Long homeId;
 
     private static final long serialVersionUID = 1L;
 }
